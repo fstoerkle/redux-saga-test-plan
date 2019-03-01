@@ -1,6 +1,7 @@
 // @flow
 import { put } from 'redux-saga/effects';
 import createErrorMessage from 'testSaga/createErrorMessage';
+import diff from 'jest-diff';
 import serializeEffect from 'shared/serializeEffect';
 
 const header = 'hello world';
@@ -22,10 +23,8 @@ test('includes the assertion number, header and serialized effects', () => {
   const serializedDonePut = serializeEffect(donePut, effectKey);
   const serializedReadyPut = serializeEffect(readyPut, effectKey);
 
-  const expected =
-    `\nAssertion ${stepNumber} failed: ${header}\n\n` +
-    `Expected\n--------\n${serializedReadyPut}\n\n` +
-    `Actual\n------\n${serializedDonePut}\n`;
+  const diffOutput = diff(serializedReadyPut, serializedDonePut);
+  const expected = `\nAssertion ${stepNumber} failed: ${header}\n\n${diffOutput}`;
 
   expect(result).toBe(expected);
 });
@@ -39,10 +38,8 @@ test('includes the assertion number, header and serialized values', () => {
   const serializedActual = serializeEffect(actual);
   const serializedExpected = serializeEffect(expected);
 
-  const expectedTestResult =
-    `\nAssertion ${stepNumber} failed: ${header}\n\n` +
-    `Expected\n--------\n${serializedExpected}\n\n` +
-    `Actual\n------\n${serializedActual}\n`;
+  const diffOutput = diff(serializedExpected, serializedActual);
+  const expectedTestResult = `\nAssertion ${stepNumber} failed: ${header}\n\n${diffOutput}`;
 
   expect(result).toBe(expectedTestResult);
 });
